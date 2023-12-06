@@ -12,8 +12,15 @@ func main() {
 	u, p, e, pn := details()
 
 	db := createdb()
-	defer db.Close()
+
 	inserting(db, u, p, e, pn)
+	fmt.Println("enter which details you want to retrive :")
+	
+	result := retrive(db)
+	for _, v := range result {
+		fmt.Println(v)
+		defer db.Close()
+	}
 
 }
 func details() (string, int, string, string) {
@@ -33,7 +40,7 @@ func details() (string, int, string, string) {
 
 }
 func createdb() *sql.DB {
-	condetail := "user=santhosha dbname=mydb_1 password=santhosha@123 "
+	condetail := "user=postgres dbname=postgres password=test@123 "
 	db, err := sql.Open("postgres", condetail)
 	if err != nil {
 		log.Fatal(err)
@@ -43,12 +50,36 @@ func createdb() *sql.DB {
 	return db
 }
 
-func inserting(d *sql.DB, username string, phno int, email string, pname string) {
-	rows := "insert into empdetails(username,phno,email) values ($1,$2,$3,$4)"
+func inserting(d *sql.DB, username string, phno int, email string, pname string) error {
+	rows := "insert into empdetails(username,phno,email,pname) values ($1,$2,$3,$4)"
 	_, err := d.Exec(rows, username, phno, email, pname)
+	if err != nil {
+		return err
+	} else {
+		fmt.Println("data inserted ")
+	}
+	return nil
+}
+func retrive(db *sql.DB) []string {
+	rows, err := db.Query("select * from empdetails ")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("data inserted ")
+	// rows.Close()
+
+	var data []string
+	for rows.Next() {
+		var nme string
+		var pn int64
+		var eml string
+		var pnme string
+		err := rows.Scan(&nme, &pn, &eml, &pnme)
+		if err != nil {
+			log.Fatal(err)
+		}
+		data = append(data, fmt.Sprintf("name : %s,phone number : %d , email : %s ,project name : %s", nme, pn, eml, pnme))
+
+	}
+	return data
 
 }
