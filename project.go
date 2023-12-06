@@ -8,19 +8,36 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var db *sql.DB
+
 func main() {
-	u, p, e, pn := details()
+	fmt.Println("1.Enter user details")
+	fmt.Println("2.Display user details ")
+	fmt.Println("3. Enter project details")
+	fmt.Println("6. Retrieve All the data in the database")
+	fmt.Println("4. Retrieve only specified person data ")
+	fmt.Println("5.Retrieve only the project details of specified person ")
 
-	db := createdb()
+	fmt.Println("ENTER YOUR CHOICE : ")
+	var choice int
+	fmt.Scan(&choice)
 
-	inserting(db, u, p, e, pn)
-	fmt.Println("enter which details you want to retrive :")
-	
-	result := retrive(db)
-	for _, v := range result {
-		fmt.Println(v)
-		defer db.Close()
+	switch choice {
+	case 1:
+		u, p, e, pn := details()
+		db := createdb()
+		inserting(db, u, p, e, pn)
+	case 2:
+
+		result := retrive(db)
+		for _, v := range result {
+			fmt.Println(v)
+			defer db.Close()
+		}
+
 	}
+
+	fmt.Println("enter which details you want to retrive :")
 
 }
 func details() (string, int, string, string) {
